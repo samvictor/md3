@@ -2,7 +2,7 @@
 #from __future__ import print_function
 
 import numpy, csv, numbers, ast, json
-from sklearn import manifold, datasets
+from sklearn import manifold, datasets, preprocessing
 from sklearn.decomposition import PCA, NMF, FastICA, FactorAnalysis
 # scikits-learn
 # dimension reduction
@@ -65,6 +65,16 @@ dimensions = 2
 X = numpy.array(strip_labels(letter_data))
 
 numpy.set_printoptions(threshold=numpy.nan)
+X = numpy.transpose(X)
+
+range_scaler = preprocessing.MinMaxScaler()
+#print "X =", X
+for i in range(0, len(X)):
+	X[i] = range_scaler.fit_transform(X[i])
+
+#print "scaled =", X
+
+X = numpy.transpose(X)
 #print X
 
 # MDS
