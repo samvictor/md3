@@ -10,6 +10,7 @@ requirejs.config({
 
 // Start loading the main app file
 requirejs(['../libr/d3.min','../libr/jquery.min','../main/md3']);
+//requirejs(['d3.min','jquery','../main/md3']);
 /*try
 {
 	requirejs(['lib/d3.min','lib/jquery','main/md3']);
