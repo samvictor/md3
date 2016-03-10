@@ -5,7 +5,7 @@ requirejs.config({
 	//baseUrl: '..',
 	paths: {
 		//jquery: "jquery.min"
-		req_jquery: "http://code.jquery.com/jquery-1.12.0.min.js"
+		req_jquery: "http://code.jquery.com/jquery-1.12.0.min.js",
 		req_d3: "http://d3js.org/d3.v3.min.js"
 	}
 });
