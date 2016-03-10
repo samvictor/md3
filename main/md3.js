@@ -18,7 +18,8 @@ document.head.appendChild(md3_style);
 
 // Require.js
 //define(['../libr/jquery.min', '../libr/d3.min'], function ( $, d3 ) {
-define(['req_jquery', 'req_d3'], function ( $, d3 ) {
+define(['jquery', 'req_d3'], function ( $, d3 ) {
+	
 	var w_w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	var w_h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 	var margin = {top: 10, right: 6, bottom: 20, left: 60}
