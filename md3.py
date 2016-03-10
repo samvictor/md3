@@ -51,31 +51,67 @@ def strip_labels(data):
 	for row in data[2:]:
 		ret_data.append(row[2:])
 	return ret_data
-
+"""
 def add_labels(coords, original):
 	combined = []
 	for i in range(0, len(coords)):
 		combined.append({"label":original[i+1][0], "pretty_label":original[i+1][1],
 											"x":coords[i,0], "y":coords[i,1]})
 	return combined
-
+"""
 
 # Scikit learn
 dimensions = 2
 X = numpy.array(strip_labels(letter_data))
 
+
+# S curve
+from sklearn import manifold, datasets
+
+n_points = 1000
+#X, color = datasets.samples_generator.make_swiss_roll(n_points, random_state=0)
+X, color = datasets.samples_generator.make_s_curve(n_points, random_state=0)
+
+def add_labels (coords, original):
+	combined = []
+	for i in range(0, len(coords)):
+		combined.append({"label": str(i), "pretty_label": str(i),
+											"x":coords[i,0], "y":coords[i,1]})
+	return combined
+
+"""
+# sphere
+from sklearn.utils import check_random_state
+
+n_samples = 1000
+
+random_state = check_random_state(0)
+p = random_state.rand(n_samples) * (2 * numpy.pi - 0.55)
+t = random_state.rand(n_samples) * numpy.pi
+
+indices = ((t < (numpy.pi - (numpy.pi / 8))) & (t > ((numpy.pi / 8))))
+colors = p[indices]
+
+sp_x, sp_y, sp_z = numpy.sin(t[indices]) * numpy.cos(p[indices]), \
+    numpy.sin(t[indices]) * numpy.sin(p[indices]), \
+    numpy.cos(t[indices])	
+
+X = numpy.array([sp_x, sp_y, sp_z]).T
+#print X
+"""
+
+# normalize data
+
 numpy.set_printoptions(threshold=numpy.nan)
 X = numpy.transpose(X)
 
 range_scaler = preprocessing.MinMaxScaler()
-#print "X =", X
+
 for i in range(0, len(X)):
 	X[i] = range_scaler.fit_transform(X[i])
 
-#print "scaled =", X
 
 X = numpy.transpose(X)
-#print X
 
 # MDS
 mds = manifold.MDS(n_components = dimensions, max_iter=100, n_init=1)
