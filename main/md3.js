@@ -322,6 +322,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			yDomain = [Math.max.apply(null, yPos),
 					   Math.min.apply(null, yPos)],
 			pointRadius = params.pointRadius || 3;
+			var opacity = params.opacity || .5;
 
 		if (params.reverseX) {
 			xDomain.reverse();
@@ -404,7 +405,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 							}
 						
 						return "steelblue";
-					});
+					}).attr("fill-opacity", opacity);
 			}
 			
 			var d_keys = Object.keys(dot_svgs);
@@ -420,7 +421,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 						{	
 							return "steelblue";
 						}
-					});
+					}).attr("fill-opacity", opacity);
 					
 			for(var j = 2; j < keys.length; j++)
 			{
@@ -494,7 +495,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				else {	
 					return "steelblue";
 				}
-			})
+			}).attr("fill-opacity", opacity)
 			.on("mouseover", function()
 			{
 				d3.select(this)
@@ -508,12 +509,12 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 					  d3.select(this)
 						.transition()
 						.duration(50)
-						.attr("fill", "darkred");
+						.attr("fill", "darkred").attr("fill-opacity", opacity);
 				}
 				else
 				{
 					  d3.select(this)
-						.attr("fill", "steelblue");
+						.attr("fill", "steelblue").attr("fill-opacity", opacity);
 				}
 				
 				over_elm = false;
@@ -542,7 +543,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 							{	
 								return "steelblue";
 							}
-						})
+						}).attr("fill-opacity", opacity)
 				for(var j = 2; j < keys.length; j++)
 				{
 					bar_svgs[keys[j]].selectAll(".bar")
