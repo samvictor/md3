@@ -72,12 +72,47 @@ n_points = 1000
 #X, color = datasets.samples_generator.make_swiss_roll(n_points, random_state=0)
 X, color = datasets.samples_generator.make_s_curve(n_points, random_state=0)
 
+#for i in range(0, len(X)):
+#	X[i][0] *= 1000
+#print X
+
 def add_labels (coords, original):
 	combined = []
 	for i in range(0, len(coords)):
-		combined.append({"label": str(i), "pretty_label": str(i),
+		combined.append({"label": "row_"+str(i), "pretty_label": str(i),
 											"x":coords[i,0], "y":coords[i,1]})
 	return combined
+
+def add_labels2 (coords):
+	combined = []
+	for i in range(0, len(coords)):
+		combined.append({"label": "row_"+str(i), "pretty_label": str(i),
+											"x":coords[i,0], "y":coords[i,1], "z":coords[i,2]})
+	return combined
+
+def make_csv(sphere_data):	
+	sphere_data = add_labels2(sphere_data)
+	with open('sphere_data.csv', 'wb+') as sphere_file:
+		sphere_writer = csv.writer(sphere_file, delimiter=',')
+		
+		sphere_writer.writerow(['md3_id', 'name', 'x', 'y', 'z'])
+		
+		amount = 398.0
+		data_size = 0.0
+		data_size = len(sphere_data)
+		step = 0.0
+		step = data_size/amount
+		print len(sphere_data)
+		count = 0
+		
+		for i in range(0, int(len(sphere_data)/step)):
+			r = sphere_data[i*int(step)]
+			sphere_writer.writerow([r['label'], r['pretty_label'], r['x'], r['y'], r['z']])
+			count += 1
+		
+		print count
+
+make_csv(X)
 
 """
 # sphere

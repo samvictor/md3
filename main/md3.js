@@ -1,4 +1,4 @@
-datafile = "md3_data.csv";
+datafile = "sphere_data.csv";
 
 // css
 var md3_style = document.createElement('style');
@@ -66,6 +66,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 		id_keys = {};
 		for (k in keys)
 		{
+			// data is as string and must be turned into reals				
 			id_keys[keys[k]] = id_appropriate(keys[k]);
 			x[id_keys[keys[k]]] = d3.scale.ordinal().rangeRoundBands([0, width], 0);
 			y[id_keys[keys[k]]] = d3.scale.linear().range([height, 0]);
@@ -78,6 +79,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			yAxis[id_keys[keys[k]]] =  d3.svg.axis()
 				.scale(y[id_keys[keys[k]]])
 				.orient("left");
+			
 		}
 		
 		// show histograms for each attribute
@@ -123,7 +125,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				document.getElementById('md3message').innerHTML="<p>Descending by "+att+"</p>";
 				mySort = function (array)
 				{
-					return array.sort(function(d1, d2){return d2[att] - d1[att]});
+					return array.sort(function(d1, d2){alert(d1[att]);return d2[att] - d1[att]});
 				}
 			}
 			else if (sortedBy[1] == "desc")
@@ -191,8 +193,9 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			x_range = x[id_keys[att]];
 			y_range = y[id_keys[att]];
 			
+			// set values for axes
 			x_range.domain(data.map(function(d) { return d[keys[0]]; }));
-			y_range.domain([0, d3.max(data, function(d) { return parseFloat(d[att]); })]);
+			y_range.domain([d3.min(data, function(d) { return parseFloat(d[att]); }), d3.max(data, function(d) { return parseFloat(d[att]); })]);
 					
 			bar_svgs[att].append("g")
 				.attr("class", "x axis")
