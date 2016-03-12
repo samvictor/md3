@@ -55,6 +55,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	var chosen = [];
 	over_elm = false;
 	var down_location;
+	var axis_color = "#0060ff";
 
 	// ---------------------------- BARS ---------------------------------------
 	// main function
@@ -117,6 +118,14 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	// change sort
 	SwitchFunction = function(att)
 	{	
+		//var clicked = document.getElementById(att+"_axis_text");
+		//clicked.attr("fill", "darkred");
+		//d3.select(clicked).attr("fill", "darkred");
+		//console.log(clicked);
+		//bar_svgs[att].select("#"+att+"_axis_text")
+		//				.selectAll("g")
+		//				.attr("fill", "darkred");
+		
 		if (sortedBy[0] == att)
 		{
 			if(sortedBy[1] == "asc")
@@ -125,7 +134,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				document.getElementById('md3message').innerHTML="<p>Descending by "+att+"</p>";
 				mySort = function (array)
 				{
-					return array.sort(function(d1, d2){alert(d1[att]);return d2[att] - d1[att]});
+					return array.sort(function(d1, d2){return d2[att] - d1[att]});
 				}
 			}
 			else if (sortedBy[1] == "desc")
@@ -195,7 +204,9 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			
 			// set values for axes
 			x_range.domain(data.map(function(d) { return d[keys[0]]; }));
-			y_range.domain([d3.min(data, function(d) { return parseFloat(d[att]); }), d3.max(data, function(d) { return parseFloat(d[att]); })]);
+			var data_max = d3.max(data, function(d) { return parseFloat(d[att]); });
+			var data_min = d3.min(data, function(d) { return parseFloat(d[att]); });
+			y_range.domain([ data_min - Math.abs(data_max - data_min)/16, data_max]);
 					
 			bar_svgs[att].append("g")
 				.attr("class", "x axis")
@@ -215,11 +226,13 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				.attr("transform", "rotate(-90)")
 				.attr("y", -48)
 				.attr("dy", ".3em")
-				.style("text-anchor", "end")
+				.style("text-anchor", "end")				
+				.attr("fill", axis_color)
 			.text(att)
 				.attr("onclick", "SwitchFunction('"+att+"')")
 				.style("cursor", "pointer")
-				.attr("font-size", "16");
+				.attr("font-size", "16")
+				.attr("id", att+"_axis_text");
 			
 			bar_svgs[att].selectAll(".bar")
 				.data(data)
