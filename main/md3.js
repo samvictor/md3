@@ -14,7 +14,9 @@ md3_style.innerHTML = ".bar:hover { cursor: pointer;}		\
 						fill-opacity: .125;					\
 						shape-rendering: crispEdges;}		\
 		#pca, #mds, #nmf, #ica, #fa, #tsne { cursor: crosshair; }	\
-		#md3_header { width: 100%; background-color: #ffffff; border: 1px solid steelblue; padding: .4em;}	\
+		#md3_header { width: 100%; background-color: #003060;		\
+						border: 3px solid #303030; padding: .4em; \
+						margin: -10px; text-align: center;}			\
 		\
 		";
 document.head.appendChild(md3_style);
@@ -596,11 +598,12 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	//------------------------------------ Calling main functions -----------------------------
 
 	var header_div = makeDiv("md3_header");
-	header_div.style.width = "99%";
 	
 	var title = make_text("MD3", "H2", "md3_header");
-	
 	title.style.display = "inline-block";
+	title.style.color = "#ffffff";
+	title.style.margin = ".2em";
+	
 	var file_selector = document.createElement("SELECT");
 	header_div.appendChild(file_selector);
 	file_selector.style.margin = "1em";
@@ -697,7 +700,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				}
 				
 				var plot_w = w_w*.23 - 30
-				var plot_h = plot_w - 60
+				var plot_h = plot_w - 40
 				
 				mdsDrawD3ScatterPlot(d3.select("#"+py_data[i].name), py_coords.x, py_coords.y, py_coords.labels,
 						py_coords.pretty_labels,
