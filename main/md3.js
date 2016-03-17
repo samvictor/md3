@@ -596,6 +596,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	//------------------------------------ Calling main functions -----------------------------
 
 	var header_div = makeDiv("md3_header");
+	header_div.style.width = "99%";
 	
 	var title = make_text("MD3", "H2", "md3_header");
 	
@@ -651,15 +652,15 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 
 	var md3Bars = makeDiv('md3Bars');
 	md3Bars.innerHTML = "<h2>Bar Graphs</h2>";
-	md3Bars.style.height = w_h - 30 + "px";
+	md3Bars.style.height = w_h - 130 + "px";
 	md3Bars.style.overflowY = "auto";
 	bar_cell.appendChild(md3Bars);
 	d3.csv(bar_datafile, function(data){return data}, md3_bars);
 
 	var dots = makeDiv("dots");
 	dot_cell.appendChild(dots);
-	dots.style.height = w_h - 30 + "px";
-	dots.style.overflowY = "auto";
+	//dots.style.height = w_h - 60 + "px";
+	//dots.style.overflowY = "auto";
 	
 	var dots_table = "<table>\
 		<tbody><tr>\
@@ -696,11 +697,11 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				}
 				
 				var plot_w = w_w*.23 - 30
-				var plot_h = plot_w
+				var plot_h = plot_w - 60
 				
 				mdsDrawD3ScatterPlot(d3.select("#"+py_data[i].name), py_coords.x, py_coords.y, py_coords.labels,
 						py_coords.pretty_labels,
-					{"w":plot_w, "h":plot_h, "padding":0, "pointRadius": 4, "parent":py_data[i].name})
+					{"w":plot_w, "h":plot_h, "padding":0, "pointRadius": 5, "parent":py_data[i].name})
 				
 				if (callback)
 				{
