@@ -1,4 +1,5 @@
-datafile = "sphere_data.csv";
+bar_datafile = "s_curve.csv";
+plot_datafile = "main/s_curve.json";
 
 // css
 var md3_style = document.createElement('style');
@@ -12,7 +13,9 @@ md3_style.innerHTML = ".bar:hover { cursor: pointer;}		\
 		.brush .extent { stroke: #fff;						\
 						fill-opacity: .125;					\
 						shape-rendering: crispEdges;}		\
-		#pca, #mds, #nmf, #ica, #fa, #tsne { cursor: crosshair; }													\
+		#pca, #mds, #nmf, #ica, #fa, #tsne { cursor: crosshair; }	\
+		#md3_header { width: 100%; background-color: #ffffff; border: 1px solid steelblue; padding: .4em;}	\
+		\
 		";
 document.head.appendChild(md3_style);
 
@@ -55,7 +58,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	var chosen = [];
 	over_elm = false;
 	var down_location;
-	var axis_color = "#0060ff";
+	var axis_color = "steelblue";
 
 	// ---------------------------- BARS ---------------------------------------
 	// main function
@@ -90,7 +93,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			makeDiv(att, 'md3Bars');
 			bar_svgs[att] = makeSvg(att);
 			
-			d3.csv(datafile, function(data){return data}, show(att));
+			d3.csv(bar_datafile, function(data){return data}, show(att));
 			
 			if (i != keys.length-1)
 			{
@@ -176,7 +179,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 		
 		for(var m = 1; m < keys.length; m++)
 		{	
-			d3.csv(datafile, function(d){return d;}, show(keys[m]));
+			d3.csv(bar_datafile, function(d){return d;}, show(keys[m]));
 		}
 	}
 
@@ -592,6 +595,48 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 
 	//------------------------------------ Calling main functions -----------------------------
 
+	var header_div = makeDiv("md3_header");
+	
+	var title = make_text("MD3", "H2", "md3_header");
+	
+	title.style.display = "inline-block";
+	var file_selector = document.createElement("SELECT");
+	header_div.appendChild(file_selector);
+	file_selector.style.margin = "1em";
+	file_selector.onchange = function (event)
+		{
+			bar_datafile = event.srcElement.value.split(',')[0];
+			plot_datafile = event.srcElement.value.split(',')[1];	
+			
+			$("#mds_cell").html("");
+			$("#pca_cell").html("");
+			$("#nmf_cell").html("");
+			$("#ica_cell").html("");
+			$("#fa_cell").html("");
+			$("#tsne_cell").html("");
+			
+			$("#md3Bars").html("<h2>Bar Graphs</h2>");
+			
+			chosen = [];
+			
+			d3.csv(bar_datafile, function(data){return data}, md3_bars);
+			ScatterPlot(plot_datafile);	
+		};
+	
+	var py_charts = [];
+	
+	
+	
+	var file_1 = document.createElement("option");
+	file_1.text = "S Curve";
+	file_1.value = "s_curve.csv,main/s_curve.json";
+	file_selector.add(file_1);
+	
+	var file_2 = document.createElement("option");
+	file_2.text = "Car Data";
+	file_2.value = "cars.csv,main/cars.json";
+	file_selector.add(file_2);
+	
 	var md3_display = makeDiv('md3_display');
 
 	var display_table = document.createElement("TABLE");
@@ -609,7 +654,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	md3Bars.style.height = w_h - 30 + "px";
 	md3Bars.style.overflowY = "auto";
 	bar_cell.appendChild(md3Bars);
-	d3.csv(datafile, function(data){return data}, md3_bars);
+	d3.csv(bar_datafile, function(data){return data}, md3_bars);
 
 	var dots = makeDiv("dots");
 	dot_cell.appendChild(dots);
@@ -631,33 +676,41 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	
 	dots.innerHTML = dots_table;
 	
-	
-	$.getJSON("main/data.json", function(py_data)
+	function ScatterPlot(in_file, callback)
 	{
-		var py_charts = []
-		for (var i = 0; i < py_data.length; i++)
+		$.getJSON(in_file, function(py_data)
 		{
-			py_charts.push(makeDiv(py_data[i].name, py_data[i].name+"_cell"));
-			make_text(py_data[i].p_name, "h2", py_data[i].name).style.marginBottom = 0;;
-			py_coords = {'labels':[], 'pretty_labels':[], 'x':[], 'y':[]};
-			
-			for (var j = 0; j < py_data[i].data.length; j++)
+			py_charts = []
+			for (var i = 0; i < py_data.length; i++)
 			{
-				py_coords.labels.push(py_data[i].data[j].label);
-				py_coords.pretty_labels.push(py_data[i].data[j].pretty_label);
-				py_coords.x.push(py_data[i].data[j].x);
-				py_coords.y.push(py_data[i].data[j].y);
+				py_charts.push(makeDiv(py_data[i].name, py_data[i].name+"_cell"));
+				make_text(py_data[i].p_name, "h2", py_data[i].name).style.marginBottom = 0;;
+				py_coords = {'labels':[], 'pretty_labels':[], 'x':[], 'y':[]};
+				
+				for (var j = 0; j < py_data[i].data.length; j++)
+				{
+					py_coords.labels.push(py_data[i].data[j].label);
+					py_coords.pretty_labels.push(py_data[i].data[j].pretty_label);
+					py_coords.x.push(py_data[i].data[j].x);
+					py_coords.y.push(py_data[i].data[j].y);
+				}
+				
+				var plot_w = w_w*.23 - 30
+				var plot_h = plot_w
+				
+				mdsDrawD3ScatterPlot(d3.select("#"+py_data[i].name), py_coords.x, py_coords.y, py_coords.labels,
+						py_coords.pretty_labels,
+					{"w":plot_w, "h":plot_h, "padding":0, "pointRadius": 4, "parent":py_data[i].name})
+				
+				if (callback)
+				{
+					callback();
+				}
 			}
-			
-			var plot_w = w_w*.23 - 30
-			var plot_h = plot_w
-			
-			mdsDrawD3ScatterPlot(d3.select("#"+py_data[i].name), py_coords.x, py_coords.y, py_coords.labels,
-					py_coords.pretty_labels,
-				{"w":plot_w, "h":plot_h, "padding":0, "pointRadius": 4, "parent":py_data[i].name})
-
-		}
-	});
+		});
+		
+	}
+	ScatterPlot(plot_datafile);
 
 	// create new div
 	function makeDiv(newId, parent)
@@ -711,6 +764,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 		
 		return t;
 	}
+	
 
 });
 

@@ -13,13 +13,6 @@ from sklearn.decomposition import PCA, NMF, FastICA, FactorAnalysis
 # matplotlib
 # seaborn
 # create test 2d array
-"""
-test_data = []
-test_data.append(["letter", "frequency", "milage"])
-test_data.append(["A", 4, 1])
-test_data.append(["B", 5, 2])
-test_data.append(["C", 4, 3])
-"""
 
 # Get data from csv
 letter_data = []
@@ -51,20 +44,21 @@ def strip_labels(data):
 	for row in data[2:]:
 		ret_data.append(row[2:])
 	return ret_data
-"""
+
+# for car data
 def add_labels(coords, original):
 	combined = []
 	for i in range(0, len(coords)):
 		combined.append({"label":original[i+1][0], "pretty_label":original[i+1][1],
 											"x":coords[i,0], "y":coords[i,1]})
 	return combined
-"""
+
 
 # Scikit learn
 dimensions = 2
 X = numpy.array(strip_labels(letter_data))
 
-
+"""
 # S curve
 from sklearn import manifold, datasets
 
@@ -113,7 +107,7 @@ def make_csv(sphere_data):
 		print count
 
 make_csv(X)
-
+"""
 """
 # sphere
 from sklearn.utils import check_random_state
@@ -186,6 +180,7 @@ to_file = [{"name": "mds", "p_name":"MDS", "data": add_labels(mds_out, letter_da
 json_file = open('main/data.json', 'w+')
 json.dump(to_file, fp=json_file)
 json_file.close()
+
 
 """
 # start server
