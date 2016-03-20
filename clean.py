@@ -85,9 +85,8 @@ for i in range(1, len(data)):
 for row in data:
     print row
     
-#print data
 # file name should only have one dot
-#with open(datafile.split('.')[0]+'_clean.'+datafile.split('.')[1], 'wb') as fixed_file:
-#    fixed_writer = csv.writer(fixed_file, delimiter=',')
-#    for r in data:
-#        fixed_writer.writerow(r)
+with open(datafile.split('.')[0]+'_clean.'+datafile.split('.')[1], 'wb') as fixed_file:
+    fixed_writer = csv.writer(fixed_file, delimiter=',')
+    for r in data:
+        fixed_writer.writerow(r)

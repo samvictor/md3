@@ -15,8 +15,15 @@ md3_style.innerHTML = ".bar:hover { cursor: pointer;}		\
 						shape-rendering: crispEdges;}		\
 		#pca, #mds, #nmf, #ica, #fa, #tsne { cursor: crosshair; }	\
 		#md3_header { width: 100%; background-color: #003060;		\
-						border: 3px solid #303030; padding: .4em; \
+						border: 3px solid #181818; padding: .4em;   \
 						margin: -10px; text-align: center;}			\
+        .tick, .axis { /*make text not selectable*/				\
+				-webkit-touch-callout: none;    			\
+				-webkit-user-select: none;   				\
+				-khtml-user-select: none;    				\
+				-moz-user-select: none;      				\
+				-ms-user-select: none;       				\
+				user-select: none;}							\
 		\
 		";
 document.head.appendChild(md3_style);
@@ -191,6 +198,8 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 		return d3.select("#"+divId).append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
+                //.attr("cursor", "crosshair")
+                
 			.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 	}
