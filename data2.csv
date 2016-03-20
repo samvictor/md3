@@ -1,4 +1,4 @@
-letter,frequency,milage
-A,4,1
-B,5,2
-C,4,3
+letter,frequency,milage, string
+A,4,1, f
+B,5,2, m
+C,4,3, f
