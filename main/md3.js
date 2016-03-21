@@ -15,10 +15,10 @@ md3_style.innerHTML = ".bar:hover { cursor: pointer;}		\
 						fill-opacity: .125;					\
 						shape-rendering: crispEdges;}		\
 		#pca, #mds, #nmf, #ica, #fa, #tsne { cursor: crosshair; }	\
-		#md3_header { width: 100%; background-color: #003060;		\
+		#md3_header { width: 99%; background-color: #003060;		\
 						border: 3px solid #181818; padding: .4em;   \
-						margin-top: -10px; margin-left -10px;		\
-						margin-right: -10px; text-align: center;}	\
+						margin-top: 0px; margin-left 0px;		\
+						margin-right: 0px; text-align: center;}	\
         .tick, .axis { /*make text not selectable*/			\
 				-webkit-touch-callout: none;    			\
 				-webkit-user-select: none;   				\
