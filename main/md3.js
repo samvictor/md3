@@ -1,6 +1,7 @@
 bar_datafile = "s_curve.csv";
 plot_datafile = "main/s_curve.json";
 
+// TODO make function to refresh bars and dots
 // css
 var md3_style = document.createElement('style');
 md3_style.innerHTML = ".bar:hover { cursor: pointer;}		\
@@ -16,8 +17,9 @@ md3_style.innerHTML = ".bar:hover { cursor: pointer;}		\
 		#pca, #mds, #nmf, #ica, #fa, #tsne { cursor: crosshair; }	\
 		#md3_header { width: 100%; background-color: #003060;		\
 						border: 3px solid #181818; padding: .4em;   \
-						margin: -10px; text-align: center;}			\
-        .tick, .axis { /*make text not selectable*/				\
+						margin-top: -10px; margin-left -10px;		\
+						margin-right: -10px; text-align: center;}	\
+        .tick, .axis { /*make text not selectable*/			\
 				-webkit-touch-callout: none;    			\
 				-webkit-user-select: none;   				\
 				-khtml-user-select: none;    				\
@@ -37,6 +39,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	var margin = {top: 10, right: 6, bottom: 20, left: 60}
 	//var width = w_w*.28 - 30 - margin.left - margin.right;
 	var width = 400;
+	var bar_width = width;
 	var height = w_w*.3*.4 - margin.top - margin.bottom;
 
 	//var x = d3.scale.ordinal()
@@ -61,13 +64,15 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	var yAxis = {};
 	
 	var keys;
-	var bar_svgs = {};
+	 bar_svgs = {};
 	var dot_svgs = {};
 	var sortedBy = ["first", ""];
 	var chosen = [];
 	over_elm = false;
 	var down_location;
+	var bar_down_pos;
 	var axis_color = "steelblue";
+	var opacity = .5;
 
 	// ---------------------------- BARS ---------------------------------------
 	// main function
@@ -99,7 +104,105 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 		for(var i = 2; i < keys.length; i++)
 		{
 			att = keys[i];
-			makeDiv(att, 'md3Bars');
+			bar_div = makeDiv(att, 'md3Bars');
+			
+			bar_div.style.cursor = "crosshair";
+			bar_div.addEventListener("mousedown", function (event)
+			{
+				function get_anc(el) {
+					var x_off=0;
+					var y_off=0;
+					for (; el != null; el = el.offsetParent)
+					{
+						x_off += el.offsetLeft;
+						y_off += el.offsetTop;
+					}
+					return [x_off, y_off];
+				}
+				
+				var anc = get_anc(this);
+				anc[0] += margin.left;
+				anc[1] += margin.top;
+				bar_down_pos = [event.screenX - anc[0], event.screenY - anc[1]];
+				
+				chosen = [];
+			})
+				
+			bar_div.addEventListener("mouseup", function (event)
+			{
+				function get_anc(el) {
+					var x_off=0;
+					var y_off=0;
+					for (; el != null; el = el.offsetParent)
+					{
+						x_off += el.offsetLeft;
+						y_off += el.offsetTop;
+					}
+					return [x_off, y_off];
+				}
+				
+				var anc = get_anc(this);
+				anc[0] += margin.left;
+				anc[1] += margin.top;
+				var bar_up_pos = [event.screenX - anc[0], event.screenY - anc[1]];
+				
+				console.log("up = " + bar_up_pos + " down = " + bar_down_pos);
+		
+				var b_keys = Object.keys(bar_svgs);
+				// just use the first bar graph
+				var temp_bars = bar_svgs[b_keys[0]];
+		
+					temp_bars.selectAll(".bar").attr("fill", function(d)
+					{
+						var current = d3.select(this);
+						var x_pos = current.attr("x");
+						
+						if (Math.min(bar_down_pos[0], bar_up_pos[0]) < x_pos 
+								&& x_pos < Math.max(bar_down_pos[0], bar_up_pos[0]))
+						{
+							chosen.push(d['md3_id']);
+							console.log(d);
+							return "darkred";	
+						}
+						
+						return "steelblue";
+					});
+				
+				
+				// refresh dots and bars
+				var d_keys = Object.keys(dot_svgs);
+				for(var d=0; d < d_keys.length; d++)
+					dot_svgs[d_keys[d]].selectAll("circle")
+						.attr("fill", function(d2)
+						{
+							if( chosen.indexOf(d2[0]) >= 0)
+							{ 
+								return "darkred";
+							}
+							else
+							{	
+								return "steelblue";
+							}
+						}).attr("fill-opacity", opacity);
+						
+				for(var j = 2; j < keys.length; j++)
+				{
+					bar_svgs[keys[j]].selectAll(".bar")
+						.attr("fill", function(d)
+						{
+							if(chosen.indexOf(d[keys[0]]) >= 0)
+							{ 
+								return "darkred";
+							}
+							else
+							{	
+								return "steelblue";
+							}
+					});
+				}
+				
+			})
+			
 			bar_svgs[att] = makeSvg(att);
 			
 			d3.csv(bar_datafile, function(data){return data}, show(att));
@@ -198,8 +301,6 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 		return d3.select("#"+divId).append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
-                //.attr("cursor", "crosshair")
-                
 			.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 	}
@@ -349,7 +450,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			yDomain = [Math.max.apply(null, yPos),
 					   Math.min.apply(null, yPos)],
 			pointRadius = params.pointRadius || 3;
-			var opacity = params.opacity || .5;
+			opacity = params.opacity || .5;
 
 		if (params.reverseX) {
 			xDomain.reverse();
@@ -367,7 +468,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 					x_off += el.offsetLeft;
 					y_off += el.offsetTop;
 				}
-				return [x_off, y_off]
+				return [x_off, y_off];
 			}
 			var anc = get_anc(this);
 			/*if (this.id == "mds")
@@ -392,7 +493,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 					x_off += el.offsetLeft;
 					y_off += el.offsetTop;
 				}
-				return [x_off, y_off]
+				return [x_off, y_off];
 			}
 			var anc = get_anc(this);
 			/*if (this.id == "mds")
@@ -403,7 +504,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			
 			
 			var up_location = [e.pageX - anc[0], e.pageY - anc[1]];
-			console.log("up = " + up_location + " down = " + down_location);
+			//console.log("up = " + up_location + " down = " + down_location);
 			
 			var d_keys = Object.keys(dot_svgs);
 			for(var div_num=0; div_num < d_keys.length; div_num++)
@@ -435,6 +536,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 					}).attr("fill-opacity", opacity);
 			}
 			
+			// refresh dots and bars
 			var d_keys = Object.keys(dot_svgs);
 			for(var d=0; d < d_keys.length; d++)
 				dot_svgs[d_keys[d]].selectAll("circle")
@@ -465,7 +567,6 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 						}
 				});
 			}
-					
 		});
 
 		var xScale = d3.scale.linear().
@@ -631,6 +732,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			$("#md3Bars").html("<h2>Bar Graphs</h2>");
 			
 			chosen = [];
+			bar_svgs = {};
 			
 			d3.csv(bar_datafile, function(data){return data}, md3_bars);
 			ScatterPlot(plot_datafile);	
@@ -653,7 +755,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	var md3_display = makeDiv('md3_display');
 
 	var display_table = document.createElement("TABLE");
-	display_table.style.width = "100%";
+	//display_table.style.width = "100%";
 	var disp_row = display_table.insertRow(0);
 	var dot_cell = disp_row.insertCell(0);
 	var bar_cell = disp_row.insertCell(1);
@@ -666,6 +768,9 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	md3Bars.innerHTML = "<h2>Bar Graphs</h2>";
 	md3Bars.style.height = w_h - 130 + "px";
 	md3Bars.style.overflowY = "auto";
+	md3Bars.style.width = bar_width + 90 + "px";
+	md3Bars.style.overflowX = "visible";
+	
 	bar_cell.appendChild(md3Bars);
 	d3.csv(bar_datafile, function(data){return data}, md3_bars);
 
