@@ -18,6 +18,11 @@ if len(sys.argv) > 1:
         if sys.argv == "has_labels":
             has_labels = True
 
+# for financial data
+ignore_cols = [14, 1]
+has_labels = False
+label_col = 0
+limit_output = True
 
 row_begin = 0
 if has_labels:
@@ -25,18 +30,29 @@ if has_labels:
     
 data = []
 to_expand = []
+header = []
 with open(datafile, 'rb') as csvfile:
     data_read = csv.reader(csvfile, delimiter=',')
     for j, row in enumerate(data_read):
+        if j == 0:
+            header = row
+            
+        #for i in range(row_begin, len(row)):
         for i in range(row_begin, len(row)):
+            if i in ignore_cols and j != 0:
+                row[i] = 0 # meaning this was ignored
+            
+            if i == label_col:
+                continue
+            
             try:
                 row[i] = float(row[i])
             except:
-                if j: # if j != 0, which is where the labels are
+                if j: # if j != 0, which is where the column labels are
                     row[i] = temp_cell = row[i].strip()
                     if temp_cell == '':
                         row[i] = 0
-                        print "Warning: blank entry found, 0 used instead"
+                        print "Warning: blank entry found in " + header[i] + ", 0 used instead"
                     else:
                         if not i in to_expand:
                             to_expand.append(i)
@@ -82,11 +98,32 @@ for i in range(1, len(data)):
     data[i] = ["row_"+str(i)] + data[i]
 
 
-for row in data:
-    print row
+for i, row in enumerate(data):
+    if i < 2:
+        print row
     
 # file name should only have one dot
 with open(datafile.split('.')[0]+'_clean.'+datafile.split('.')[1], 'wb') as fixed_file:
     fixed_writer = csv.writer(fixed_file, delimiter=',')
-    for r in data:
-        fixed_writer.writerow(r)
+    
+    if limit_output:
+        fixed_writer.writerow(data[0])
+        
+        amount = 398.0
+        data_size = 0.0
+        data_size = len(data)
+        step = 0.0
+        step = data_size/amount
+        print len(data)
+        count = 0
+        
+        for i in range(1, int(len(data)/step)):
+            r = data[i*int(step)]
+            fixed_writer.writerow(r)
+            count += 1
+        
+        print "output of", len(data), "limited to",  count
+        
+    else:
+        for r in data:
+            fixed_writer.writerow(r)

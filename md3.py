@@ -1,7 +1,7 @@
 #!/usr/bin/env
 #from __future__ import print_function
 
-import numpy, csv, numbers, ast, json
+import numpy, csv, numbers, ast, json, sys
 from sklearn import manifold, datasets, preprocessing
 from sklearn.decomposition import PCA, NMF, FastICA, FactorAnalysis
 
@@ -12,10 +12,19 @@ from sklearn.decomposition import PCA, NMF, FastICA, FactorAnalysis
 # seaborn
 # create test 2d array
 
+# TODO set pretty label to row id if has labels is false
+
 # Get data from csv
 letter_data = []
 letter_label = ""
-with open('cars.csv', 'rb') as csvfile:
+if len(sys.argv) > 1:
+    in_file = sys.argv[1]
+else:
+    in_file = "cars.csv"
+    
+pretty_label_index = 2
+    
+with open(in_file, 'rb') as csvfile:
     data_read = csv.reader(csvfile, delimiter=',')
     for row in data_read:
         for i in range(1, len(row)):
@@ -31,14 +40,14 @@ with open('cars.csv', 'rb') as csvfile:
 def strip_labels(data):
     ret_data = []
     for row in data[2:]:
-        ret_data.append(row[2:])
+        ret_data.append(row[1:pretty_label_index] + row[pretty_label_index+1:])
     return ret_data
 
 # for car data
 def add_labels(coords, original):
     combined = []
     for i in range(0, len(coords)):
-        combined.append({"label":original[i+1][0], "pretty_label":original[i+1][1],
+        combined.append({"label":original[i+1][0], "pretty_label":original[i+1][pretty_label_index],
                                             "x":coords[i,0], "y":coords[i,1]})
     return combined
 

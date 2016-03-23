@@ -1,5 +1,5 @@
-bar_datafile = "s_curve.csv";
-plot_datafile = "main/s_curve.json";
+bar_datafile = "financials.csv";
+plot_datafile = "main/financials.json";
 
 // TODO make function to refresh bars and dots
 // css
@@ -69,10 +69,12 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	var sortedBy = ["first", ""];
 	var chosen = [];
 	over_elm = false;
+    over_axis_text = false;
 	var down_location;
 	var bar_down_pos;
 	var axis_color = "steelblue";
 	var opacity = .5;
+    
 
 	// ---------------------------- BARS ---------------------------------------
 	// main function
@@ -125,7 +127,8 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				anc[1] += margin.top;
 				bar_down_pos = [event.screenX - anc[0], event.screenY - anc[1]];
 				
-				chosen = [];
+                if (!over_axis_text)
+                    chosen = [];
 			})
 				
 			bar_div.addEventListener("mouseup", function (event)
@@ -146,8 +149,6 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				anc[1] += margin.top;
 				var bar_up_pos = [event.screenX - anc[0], event.screenY - anc[1]];
 				
-				console.log("up = " + bar_up_pos + " down = " + bar_down_pos);
-		
 				var b_keys = Object.keys(bar_svgs);
 				// just use the first bar graph
 				var temp_bars = bar_svgs[b_keys[0]];
@@ -161,7 +162,6 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 								&& x_pos < Math.max(bar_down_pos[0], bar_up_pos[0]))
 						{
 							chosen.push(d['md3_id']);
-							console.log(d);
 							return "darkred";	
 						}
 						
@@ -345,6 +345,9 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				.attr("fill", axis_color)
 			.text(att)
 				.attr("onclick", "SwitchFunction('"+att+"')")
+				.attr("onmouseover", "over_axis_text = true")
+				.attr("onmouseout", "over_axis_text = false")
+                
 				.style("cursor", "pointer")
 				.attr("font-size", "16")
 				.attr("id", att+"_axis_text");
@@ -649,7 +652,6 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			})
 			.on("click", function(d)
 			{
-				console.log("this is " + d3.select(this).attr("cx") + ", " + d3.select(this).attr("cy"));
 				temp_index = chosen.indexOf(d[0]);
 				if (temp_index >= 0)
 				{
@@ -752,6 +754,12 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	file_2.value = "cars.csv,main/cars.json";
 	file_selector.add(file_2);
 	
+	var file_3 = document.createElement("option");
+	file_3.text = "Financial Data";
+	file_3.value = "financials.csv,main/financials.json";
+    file_3.selected = true;
+	file_selector.add(file_3);
+	
 	var md3_display = makeDiv('md3_display');
 
 	var display_table = document.createElement("TABLE");
@@ -852,7 +860,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	
 	function id_appropriate(in_str)
 	{
-		in_str = in_str.replace(/ /g, '_').replace(/\(/g, 'p').replace(/\)/g, 'q');
+		in_str = in_str.replace(/ /g, '_').replace(/\(/g, 'p').replace(/\)/g, 'q').replace(/\//g, 'fs').replace(/\\/g, 'bs');
 		if (in_str[0] in ['0','1','2','3','4','5','6','7','8','9'])
 			in_str = "n".concat(in_str);
 		

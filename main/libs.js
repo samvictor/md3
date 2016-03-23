@@ -3,7 +3,7 @@
 requirejs.config({
 	baseUrl: '../lib',   		// for local
 	//baseUrl: '../md3/lib',   	// for github
-	enforceDefine: true,
+	//enforceDefine: true,      // might not work in IE without this
 	paths: {
 		jquery: "http://code.jquery.com/jquery-2.2.1.min",
 		'req_d3': "http://d3js.org/d3.v3.min",
