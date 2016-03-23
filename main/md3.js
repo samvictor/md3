@@ -19,7 +19,7 @@ md3_style.innerHTML = ".bar:hover { cursor: pointer;}		\
 						border: 3px solid #181818; padding: .4em;   \
 						margin-top: 0px; margin-left 0px;		\
 						margin-right: 0px; text-align: center;}	\
-        .tick, .axis { /*make text not selectable*/			\
+        .tick, .axis, h2 { /*make text not selectable*/			\
 				-webkit-touch-callout: none;    			\
 				-webkit-user-select: none;   				\
 				-khtml-user-select: none;    				\
