@@ -2,6 +2,9 @@ bar_datafile = "financials.csv";
 plot_datafile = "main/financials.json";
 
 // TODO make function to refresh bars and dots
+// Selected data should rise to the top
+// seaborn notebook
+
 // css
 var md3_style = document.createElement('style');
 md3_style.innerHTML = ".bar:hover { cursor: pointer;}		\
@@ -94,7 +97,20 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			xAxis[id_keys[keys[k]]] = d3.svg.axis()
 				.scale(x[id_keys[keys[k]]])
 				.outerTickSize(0)
-				.orient("bottom");
+				.orient("bottom")
+				.tickFormat(function (d) {
+					if (data.length < 30)
+					{
+						for (row in data)
+						{
+							if (data[row][keys[0]] == d)
+							{
+								return data[row][keys[1]];
+							}	
+						}
+					}
+					return d;
+				});
 				
 			yAxis[id_keys[keys[k]]] =  d3.svg.axis()
 				.scale(y[id_keys[keys[k]]])
@@ -430,7 +446,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 									}
 								})
 					});
-				if(data.length > 40)
+				if(data.length > 30)
 				{
 					bar_svgs[att].selectAll(".bar").append("svg:title")
 					.text(function(d) {return d[keys[1]] + ": " + d[att]; })
@@ -759,6 +775,11 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	file_3.value = "financials.csv,main/financials.json";
     file_3.selected = true;
 	file_selector.add(file_3);
+	
+	var file_4 = document.createElement("option");
+	file_4.text = "Blobs";
+	file_4.value = "blobs.csv,main/blobs.json";
+	file_selector.add(file_4);
 	
 	var md3_display = makeDiv('md3_display');
 

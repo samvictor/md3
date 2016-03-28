@@ -22,7 +22,7 @@ if len(sys.argv) > 1:
 else:
     in_file = "cars.csv"
     
-pretty_label_index = 2
+pretty_label_index = 1
     
 with open(in_file, 'rb') as csvfile:
     data_read = csv.reader(csvfile, delimiter=',')
@@ -39,7 +39,7 @@ with open(in_file, 'rb') as csvfile:
 # Some useful functions
 def strip_labels(data):
     ret_data = []
-    for row in data[2:]:
+    for row in data[1:]:
         ret_data.append(row[1:pretty_label_index] + row[pretty_label_index+1:])
     return ret_data
 
@@ -55,6 +55,7 @@ def add_labels(coords, original):
 # Scikit learn
 dimensions = 2
 X = numpy.array(strip_labels(letter_data))
+
 
 """
 # S curve
