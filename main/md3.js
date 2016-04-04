@@ -2,8 +2,11 @@ bar_datafile = "financials.csv";
 plot_datafile = "main/financials.json";
 
 // TODO make function to refresh bars and dots
-// Selected data should rise to the top
 // seaborn notebook
+// Firefox
+// local version of d3 included
+// selecting bars should remove last selected
+// use jquery to get position of bar anchors 
 
 // css
 var md3_style = document.createElement('style');
@@ -70,7 +73,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	 bar_svgs = {};
 	var dot_svgs = {};
 	var sortedBy = ["first", ""];
-	var chosen = [];
+	chosen = [];
 	over_elm = false;
     over_axis_text = false;
 	var down_location;
@@ -167,9 +170,12 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				
 				var b_keys = Object.keys(bar_svgs);
 				// just use the first bar graph
-				var temp_bars = bar_svgs[b_keys[0]];
-		
-					temp_bars.selectAll(".bar").attr("fill", function(d)
+				
+				var promise = new Promise(function (resolve, reject)
+				{
+					var temp_chosen = [];
+					var temp_bars = bar_svgs[b_keys[0]];
+					temp_bars.selectAll(".bar").each(function(d)
 					{
 						var current = d3.select(this);
 						var x_pos = current.attr("x");
@@ -178,46 +184,74 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 								&& x_pos < Math.max(bar_down_pos[0], bar_up_pos[0]))
 						{
 							chosen.push(d['md3_id']);
-							return "darkred";	
 						}
-						
-						return "steelblue";
 					});
+					
+					resolve(chosen);
+				});
 				
-				
-				// refresh dots and bars
-				var d_keys = Object.keys(dot_svgs);
-				for(var d=0; d < d_keys.length; d++)
-					dot_svgs[d_keys[d]].selectAll("circle")
-						.attr("fill", function(d2)
-						{
-							if( chosen.indexOf(d2[0]) >= 0)
-							{ 
-								return "darkred";
-							}
-							else
-							{	
-								return "steelblue";
-							}
-						}).attr("fill-opacity", opacity);
-						
-				for(var j = 2; j < keys.length; j++)
+				promise.then(function (result)
 				{
-					bar_svgs[keys[j]].selectAll(".bar")
-						.attr("fill", function(d)
+					// refresh dots and bars
+				
+					var d_keys = Object.keys(dot_svgs);
+					for(var d=0; d < d_keys.length; d++)
+					{
+						var chosen_circles = [];
+						
+						dot_svgs[d_keys[d]].selectAll("circle")
+							.attr("fill", function(d2)
+							{
+								if( chosen.indexOf(d2[0]) >= 0)
+								{ 
+									chosen_circles.push(this);
+									//d3.select(this).parentNode.appendChild(this);
+									
+									
+									return "darkred";
+								}
+								else
+								{	
+									return "steelblue";
+								}
+							}).attr("fill-opacity", opacity);
+						dot_svgs[d_keys[d]].selectAll("circle").sort(function (left, right)
 						{
-							if(chosen.indexOf(d[keys[0]]) >= 0)
-							{ 
-								return "darkred";
+							if (chosen.indexOf(left[0]) >= 0)
+							{
+								return 1;
 							}
 							else
-							{	
-								return "steelblue";
+							{
+								if (chosen.indexOf(right[0]) >= 0 )
+								{
+									return -1;
+								}
+								else
+								{
+									return 0;
+								}
 							}
-					});
-				}
-				
-			})
+						});
+					}
+					
+					for(var j = 2; j < keys.length; j++)
+					{
+						bar_svgs[keys[j]].selectAll(".bar")
+							.attr("fill", function(d)
+							{
+								if(chosen.indexOf(d[keys[0]]) >= 0)
+								{ 
+									return "darkred";
+								}
+								else
+								{	
+									return "steelblue";
+								}
+						});
+					}
+				});
+			});
 			
 			bar_svgs[att] = makeSvg(att);
 			
@@ -305,7 +339,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			bar_svgs[s].selectAll("g").remove();
 		}
 		
-		for(var m = 1; m < keys.length; m++)
+		for(var m = 2; m < keys.length; m++)
 		{	
 			d3.csv(bar_datafile, function(d){return d;}, show(keys[m]));
 		}
@@ -338,7 +372,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			var data_max = d3.max(data, function(d) { return parseFloat(d[att]); });
 			var data_min = d3.min(data, function(d) { return parseFloat(d[att]); });
 			y_range.domain([ data_min - Math.abs(data_max - data_min)/16, data_max]);
-					
+				
 			bar_svgs[att].append("g")
 				.attr("class", "x axis")
 				.attr("transform", "translate(0,"+height+")")
@@ -433,6 +467,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 						}
 						var d_keys = Object.keys(dot_svgs);
 						for(var d=0; d < d_keys.length; d++)
+						{
 							dot_svgs[d_keys[d]].selectAll("circle")
 								.attr("fill", function(d2)
 								{
@@ -445,6 +480,27 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 										return "steelblue";
 									}
 								})
+								
+								dot_svgs[d_keys[d]].selectAll("circle").sort(function (left, right)
+								{
+									if (chosen.indexOf(left[0]) >= 0)
+									{
+										return 1;
+									}
+									else
+									{
+										if (chosen.indexOf(right[0]) >= 0 )
+										{
+											return -1;
+										}
+										else
+										{
+											return 0;
+										}
+									}
+								});
+						}
+						
 					});
 				if(data.length > 30)
 				{
@@ -707,7 +763,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				}
 			});
 
-		if(labels.length > 40)
+		if(labels.length > 30)
 		{
 			nodes.append("svg:title")
 			.text(function(d) { return d[1]; })
@@ -737,8 +793,10 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	file_selector.style.margin = "1em";
 	file_selector.onchange = function (event)
 		{
-			bar_datafile = event.srcElement.value.split(',')[0];
-			plot_datafile = event.srcElement.value.split(',')[1];	
+			var target = event.target || event.srcElement;
+			
+			bar_datafile = target.value.split(',')[0];
+			plot_datafile = target.value.split(',')[1];	
 			
 			$("#mds_cell").html("");
 			$("#pca_cell").html("");
