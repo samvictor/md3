@@ -11,6 +11,7 @@ datafile = "cars.csv"
 
 # set to True if first column entries are labels
 has_labels = False
+ignore_cols = []
 
 if len(sys.argv) > 1:
     datafile = sys.argv[1]
@@ -19,10 +20,11 @@ if len(sys.argv) > 1:
             has_labels = True
 
 # for financial data
-ignore_cols = [14, 1]
+#ignore_cols = [14, 1]
+
 has_labels = False
 label_col = 0
-limit_output = True
+limit_output = False
 
 row_begin = 0
 if has_labels:
@@ -32,7 +34,7 @@ data = []
 to_expand = []
 header = []
 with open(datafile, 'rb') as csvfile:
-    data_read = csv.reader(csvfile, delimiter=',')
+    data_read = csv.reader(csvfile, delimiter=',') # change back to comma
     for j, row in enumerate(data_read):
         if j == 0:
             header = row
@@ -42,7 +44,7 @@ with open(datafile, 'rb') as csvfile:
             if i in ignore_cols and j != 0:
                 row[i] = 0 # meaning this was ignored
             
-            if i == label_col:
+            if has_labels and i == label_col:
                 continue
             
             try:
@@ -100,7 +102,7 @@ for i in range(1, len(data)):
 
 for i, row in enumerate(data):
     if i < 2:
-        print row
+        pass#print row
     
 # file name should only have one dot
 with open(datafile.split('.')[0]+'_clean.'+datafile.split('.')[1], 'wb') as fixed_file:

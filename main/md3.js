@@ -9,6 +9,7 @@ plot_datafile = "main/financials.json";
 // use jquery to get position of bar anchors 
 
 // css
+title_height = 28;
 var md3_style = document.createElement('style');
 md3_style.innerHTML = ".bar:hover { cursor: pointer;}		\
 		.axis { font: 11px sans-serif; }					\
@@ -17,6 +18,7 @@ md3_style.innerHTML = ".bar:hover { cursor: pointer;}		\
 		.x.axis path { display: none;}						\
 		#md3message {font: 14px sans-serif;}				\
 		h1, h2 {font-family: sans-serif;}					\
+		h2 {height: "+title_height+"px;}											\
 		.brush .extent { stroke: #fff;						\
 						fill-opacity: .125;					\
 						shape-rendering: crispEdges;}		\
@@ -130,6 +132,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			bar_div.style.cursor = "crosshair";
 			bar_div.addEventListener("mousedown", function (event)
 			{
+				/*
 				function get_anc(el) {
 					var x_off=0;
 					var y_off=0;
@@ -142,9 +145,22 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				}
 				
 				var anc = get_anc(this);
+				console.log("My position is " + anc[0] +", "+ anc[1]);*/
+				
+				var j_this = $(this);
+				var j_offset = j_this.offset();
+				
+				console.log("Jquery position is " + j_offset.left +", "+ j_offset.top);
+				var anc = [0,0];
+				anc[0] = j_offset.left;
+				anc[1] = j_offset.top;
+				
 				anc[0] += margin.left;
 				anc[1] += margin.top;
-				bar_down_pos = [event.screenX - anc[0], event.screenY - anc[1]];
+				
+				
+				
+				bar_down_pos = [event.pageX - anc[0], event.pageY - anc[1]];
 				
                 if (!over_axis_text)
                     chosen = [];
@@ -152,7 +168,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				
 			bar_div.addEventListener("mouseup", function (event)
 			{
-				function get_anc(el) {
+				/*function get_anc(el) {
 					var x_off=0;
 					var y_off=0;
 					for (; el != null; el = el.offsetParent)
@@ -163,10 +179,19 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 					return [x_off, y_off];
 				}
 				
-				var anc = get_anc(this);
+				var anc = get_anc(this);*/
+				
+				var j_this = $(this);
+				var j_offset = j_this.offset();
+				
+				//console.log("Jquery position is " + j_offset.left +", "+ j_offset.top);
+				var anc = [0,0];
+				anc[0] = j_offset.left;
+				anc[1] = j_offset.top;
+				
 				anc[0] += margin.left;
 				anc[1] += margin.top;
-				var bar_up_pos = [event.screenX - anc[0], event.screenY - anc[1]];
+				var bar_up_pos = [event.pageX - anc[0], event.pageY - anc[1]];
 				
 				var b_keys = Object.keys(bar_svgs);
 				// just use the first bar graph
@@ -535,7 +560,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 		}
 		// div specific mouse events
 		document.getElementById(params.parent).addEventListener('mousedown', function(e) {
-			function get_anc(el) {
+			/*function get_anc(el) {
 				var x_off=0;
 				var y_off=0;
 				for (; el != null; el = el.offsetParent)
@@ -545,12 +570,16 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				}
 				return [x_off, y_off];
 			}
-			var anc = get_anc(this);
-			/*if (this.id == "mds")
-				anc[1] += 25;
-			else if (this.id == "pca")
-				anc[1] += 25;*/
-			anc[1] += 25;
+			var anc = get_anc(this);*/
+				
+			var j_this = $(this);
+			var j_offset = j_this.offset();
+			
+			console.log("Jquery position is " + j_offset.left +", "+ j_offset.top);
+			anc = [0,0];
+			anc[0] = j_offset.left;
+			anc[1] = j_offset.top;
+			anc[1] += title_height;
 			
 			down_location = [e.pageX - anc[0], e.pageY - anc[1]];
 			if (!over_elm)
@@ -560,7 +589,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 			}
 		});
 		document.getElementById(params.parent).addEventListener('mouseup', function(e) {
-			function get_anc(el) {
+			/*function get_anc(el) {
 				var x_off=0;
 				var y_off=0;
 				for (; el != null; el = el.offsetParent)
@@ -570,12 +599,16 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				}
 				return [x_off, y_off];
 			}
-			var anc = get_anc(this);
-			/*if (this.id == "mds")
-				anc[1] += 25;
-			else if (this.id == "pca")
-				anc[1] += 25;*/
-			anc[1] += 25;
+			var anc = get_anc(this);*/
+			
+			var j_this = $(this);
+			var j_offset = j_this.offset();
+			
+			console.log("Jquery position is " + j_offset.left +", "+ j_offset.top);
+			anc = [0,0];
+			anc[0] = j_offset.left;
+			anc[1] = j_offset.top;
+			anc[1] += title_height;
 			
 			
 			var up_location = [e.pageX - anc[0], e.pageY - anc[1]];
@@ -838,6 +871,11 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	file_4.text = "Blobs";
 	file_4.value = "blobs.csv,main/blobs.json";
 	file_selector.add(file_4);
+	
+	var file_5 = document.createElement("option");
+	file_5.text = "Student Data";
+	file_5.value = "student_math.csv,main/student_math.json";
+	//file_selector.add(file_5);
 	
 	var md3_display = makeDiv('md3_display');
 
