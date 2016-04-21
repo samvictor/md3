@@ -643,10 +643,33 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 						return "steelblue";
 					}).attr("fill-opacity", opacity);
 			}
+            
+            
 			
 			// refresh dots and bars
 			var d_keys = Object.keys(dot_svgs);
 			for(var d=0; d < d_keys.length; d++)
+            {
+                // move chosens to top
+                dot_svgs[d_keys[d]].selectAll("circle").sort(function (left, right)
+						{
+							if (chosen.indexOf(left[0]) >= 0)
+							{
+								return 1;
+							}
+							else
+							{
+								if (chosen.indexOf(right[0]) >= 0 )
+								{
+									return -1;
+								}
+								else
+								{
+									return 0;
+								}
+							}
+						});
+                        
 				dot_svgs[d_keys[d]].selectAll("circle")
 					.attr("fill", function(d2)
 					{
@@ -659,7 +682,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 							return "steelblue";
 						}
 					}).attr("fill-opacity", opacity);
-					
+            }	
 			for(var j = 2; j < keys.length; j++)
 			{
 				bar_svgs[keys[j]].selectAll(".bar")
@@ -767,6 +790,26 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 				
 				var d_keys = Object.keys(dot_svgs);
 				for(var d=0; d < d_keys.length; d++)
+                {
+                    // move chosens to top
+                    dot_svgs[d_keys[d]].selectAll("circle").sort(function (left, right)
+						{
+							if (chosen.indexOf(left[0]) >= 0)
+							{
+								return 1;
+							}
+							else
+							{
+								if (chosen.indexOf(right[0]) >= 0 )
+								{
+									return -1;
+								}
+								else
+								{
+									return 0;
+								}
+							}
+						});
 					dot_svgs[d_keys[d]].selectAll("circle")
 						.attr("fill", function(d2)
 						{
@@ -779,6 +822,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 								return "steelblue";
 							}
 						}).attr("fill-opacity", opacity)
+                }
 				for(var j = 2; j < keys.length; j++)
 				{
 					bar_svgs[keys[j]].selectAll(".bar")
