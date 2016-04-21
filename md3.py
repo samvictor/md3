@@ -23,10 +23,24 @@ else:
     in_file = "cars.csv"
     
 pretty_label_index = 1
-    
+
+# for over 50k
+pretty_label_index = 0
+min_row = 0
+max_row = 30000000
+
+row_count = 0
+
 with open(in_file, 'rb') as csvfile:
     data_read = csv.reader(csvfile, delimiter=',')
     for row in data_read:
+        if row_count < min_row:
+            row_count += 1
+            continue
+        if row_count > max_row:
+            break
+        row_count += 1
+            
         for i in range(1, len(row)):
             try:
                 row[i] = ast.literal_eval(row[i])
@@ -141,30 +155,36 @@ for i in range(0, len(X)):
 
 X = numpy.transpose(X)
 
+print "Starting MDS..."
 # MDS
 mds = manifold.MDS(n_components = dimensions, max_iter=100, n_init=1)
 mds_out = mds.fit_transform(X)
+print "Finished MDS"
 
 # PCA
 pca = PCA(n_components = dimensions)
 pca_out = pca.fit(X).transform(X)
+print "Finished PCA"
 
 # NMF
 nmf = NMF(n_components = dimensions, tol=5e-3)
 nmf_out = nmf.fit(X).transform(X)
+print "Finished NMF"
 
 # ICA
 ica = FastICA(n_components = dimensions)
 ica_out = ica.fit(X).transform(X)
+print "Finished ICA"
 
 # FA
 fa = FactorAnalysis(n_components = dimensions)
 fa_out = fa.fit(X).transform(X)
+print "Finished FA"
 
 # T-SNE
 tsne = manifold.TSNE(n_components = dimensions)
 tsne_out = tsne.fit_transform(X)
-
+print "Finished T-SNE"
 
 
 # names need to be unique (pretty names don't)
@@ -176,7 +196,7 @@ to_file = [{"name": "mds", "p_name":"MDS", "data": add_labels(mds_out, letter_da
             {"name": "tsne", "p_name":"T-SNE", "data": add_labels(tsne_out, letter_data)}]
 
 # create json file
-json_file = open('main/data.json', 'w+')
+json_file = open(in_file.split('.')[0]+'_coords.json', 'w+')
 json.dump(to_file, fp=json_file)
 json_file.close()
 

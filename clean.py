@@ -14,6 +14,9 @@ has_labels = False
 ignore_cols = []
 label_col = 0
 limit_output = False
+limit_to = 398.0
+na_symbol = ""
+dump_na_rows = False
 
 if len(sys.argv) > 1:
     datafile = sys.argv[1]
@@ -23,21 +26,34 @@ if len(sys.argv) > 1:
         
 
 # for financial data
-ignore_cols = [14, 1]
-has_labels = True
-label_col = 0
+#ignore_cols = [14, 1]
+#has_labels = True
+#label_col = 0
+#limit_output = True
+
+# for adult 50k
+ignore_cols = [2,3]
+has_labels = False
+label_col = 14
 limit_output = True
+#limit_to = 3000
+na_symbol = "?"
+dump_na_rows = True
     
 data = []
 to_expand = []
 header = []
 ignored_head_count = 0
 ignored_count = 0
+print_count = 0
+skip_row = False
+
 with open(datafile, 'rb') as csvfile:
     data_read = csv.reader(csvfile, delimiter=',') # change back to comma
     
     for j, row in enumerate(data_read):
         new_row = []
+        skip_row = False
         if j == 0:
             for i, element in enumerate(row):
                 if i not in ignore_cols:
@@ -57,34 +73,52 @@ with open(datafile, 'rb') as csvfile:
                 continue # meaning this was ignored
             
             if has_labels and i == label_col:
+                if j < 2:
+                    pass#print "label is", element
                 new_row.append(element)
                 continue
             
             try:
-                float(element)
-                new_row.append(element)
+                temp_float = float(element)
+                new_row.append(temp_float)
             except:
                 if j: # if j != 0, which is where the column labels are
                     temp_element = temp_cell = element.strip()
-                    if temp_cell == '':
+                    if temp_cell == na_symbol:
                         temp_element = 0
-                        print "Warning: blank entry found in " + header[i - ignored_head_count] + ", 0 used instead"
+                        if dump_na_rows:
+                            if print_count < 10:
+                                print "Warning: blank entry found in " + header[i - ignored_head_count] + ", deleting row"
+                                print_count += 1
+                            elif print_count == 10:
+                                print "..."
+                                print_count += 1
+                            skip_row = True
+                            break
+                        if print_count < 10:
+                            print "Warning: blank entry found in " + header[i - ignored_head_count] + ", 0 used instead"
+                            print_count += 1
+                        elif print_count == 10:
+                                print "..."
+                                print_count += 1
                     else:
                         if not new_i in to_expand:
                             to_expand.append(new_i)
+                            #print "adding", header[new_i] ,"to to_expand because of", temp_cell, "at line", j
                     
                     new_row.append(temp_element)
-                    
-        data.append(new_row)
+            
+        if not skip_row:  
+            data.append(new_row)
 
-
+                
 # expand string data into different dimensions
 for i in to_expand:
     unique_strings = []
     for j, row in enumerate(data):
         if j == 0:
             continue
-        
+            
         if row[i] not in unique_strings:
             unique_strings.append(row[i])
         
@@ -100,7 +134,13 @@ for i in to_expand:
                 build_row.append(0)
         
         row += build_row
-    unique_strings = map(lambda s: str(s)+"_col_"+header[i], unique_strings)
+    unique_strings = map(lambda s: header[i]+"_"+str(s), unique_strings)
+    for k, string in enumerate(unique_strings):
+        unique_strings[k] = ''.join(c for c in string if c.isalnum() or c in "_-><")
+        unique_strings[k] = unique_strings[k].replace("-", "_")
+        unique_strings[k] = unique_strings[k].replace(">", "greater_")
+        unique_strings[k] = unique_strings[k].replace("<", "less_")
+        #print unique_strings[k]
     data[0] += unique_strings
 
 to_expand.sort(reverse = True)
@@ -132,7 +172,7 @@ with open(datafile.split('.')[0]+'_clean.'+datafile.split('.')[1], 'wb') as fixe
     if limit_output:
         fixed_writer.writerow(data[0])
         
-        amount = 398.0
+        amount = limit_to
         data_size = 0.0
         data_size = len(data)
         step = 0.0
