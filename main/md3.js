@@ -894,6 +894,7 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	var py_charts = [];
 	
 	
+    
 	
 	var file_1 = document.createElement("option");
 	file_1.text = "S Curve";
@@ -919,12 +920,20 @@ define(['jquery', 'req_d3'], function ( $, d3 ) {
 	var file_5 = document.createElement("option");
 	file_5.text = "Student Data";
 	file_5.value = "student_math.csv,main/student_math.json";
-	//file_selector.add(file_5);
+	file_selector.add(file_5);
 	
 	var file_6 = document.createElement("option");
 	file_6.text = "Census 50k Data";
 	file_6.value = "census_over50k.csv,main/census_over50k_coords.json";
 	file_selector.add(file_6);
+    
+    var file_7 = document.createElement("option");
+	file_7.text = "Wine Quality";
+	file_7.value = "wine.csv,main/wine_coords.json";
+	file_selector.add(file_7);
+    
+    
+    
 	
 	var md3_display = makeDiv('md3_display');
 

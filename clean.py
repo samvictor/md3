@@ -17,6 +17,7 @@ limit_output = False
 limit_to = 398.0
 na_symbol = ""
 dump_na_rows = False
+delimiter = ','
 
 if len(sys.argv) > 1:
     datafile = sys.argv[1]
@@ -32,13 +33,18 @@ if len(sys.argv) > 1:
 #limit_output = True
 
 # for adult 50k
-ignore_cols = [2,3]
-has_labels = False
-label_col = 14
+#ignore_cols = [2,3]
+#has_labels = False
+#label_col = 14
+#limit_output = True
+#na_symbol = "?"
+#dump_na_rows = True
+
+# for wine
+delimiter = ';'
+has_labels = True
+label_col = 0
 limit_output = True
-#limit_to = 3000
-na_symbol = "?"
-dump_na_rows = True
     
 data = []
 to_expand = []
@@ -49,7 +55,7 @@ print_count = 0
 skip_row = False
 
 with open(datafile, 'rb') as csvfile:
-    data_read = csv.reader(csvfile, delimiter=',') # change back to comma
+    data_read = csv.reader(csvfile, delimiter=delimiter)
     
     for j, row in enumerate(data_read):
         new_row = []

@@ -25,7 +25,12 @@ else:
 pretty_label_index = 1
 
 # for over 50k
-pretty_label_index = 0
+#pretty_label_index = 0
+
+# for wine
+pretty_label_index = 1
+
+
 min_row = 0
 max_row = 30000000
 
@@ -37,8 +42,8 @@ with open(in_file, 'rb') as csvfile:
         if row_count < min_row:
             row_count += 1
             continue
-        if row_count > max_row:
-            break
+        #if row_count > max_row:
+        #    break
         row_count += 1
             
         for i in range(1, len(row)):
